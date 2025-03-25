@@ -1,0 +1,358 @@
+;Orca_P1_Change Filament G-code
+;==========================================================
+;----------------------LECKIESTEIN-------------------------
+;==========================================================
+
+;_SWMC Core_Feb.15.2025
+;_Core Version_1
+;_Released_Feb.23.2025
+
+M960 S5 P0 ; start material change
+
+M106 P1 S0
+M400 
+M106 P2 S0
+M400
+
+;_______________________ determine lift off part and temps __________________
+M620 S[next_extruder]A
+
+M204 S20000
+G0 F{500 * 60}
+
+;_______________________ determin lift off part _______________________
+{if toolchange_count > 1 && (z_hop_types[current_extruder] == 0 || z_hop_types[current_extruder] == 3)}
+G17
+G2 Z{max_layer_z + z_hop[0]} I0.86 J0.86 P1 ; spiral lift a little
+{else}
+G0 Z{max_layer_z + z_hop[0]}
+{endif}
+
+;_____________ preheat nozzle _________________
+{if old_filament_temp <= nozzle_temperature_range_high[next_extruder]}
+M104 S{nozzle_temperature_range_high[next_extruder]}
+;M400 S5 ; wait some time to get temps going 
+{elsif old_filament_temp >= nozzle_temperature_range_high[next_extruder]}
+M104 S{nozzle_temperature_range_high[next_extruder]}
+M106 S255
+{endif}
+
+; for diagnoistics: this current tool change is {toolchange_count}
+
+;+++++++++++++++++++++++++++++
+;1 SteinSwitch quick_wipe_before_tool_change - clears nozzle to prevent purge from sticking
+
+;Set to "true" to use option
+;Set to "false" to skip
+
+{if true}
+;+++++++++++++++++++++++++++++
+
+;____________Move to wiper pad entry position__________
+G0 X161.3 Y261.3 ; go to wiper entry position
+G0 Z{max_layer_z + 5} ; drop bed a bit for later
+
+G0 E-12 F{retraction_speed[previous_extruder] * 60} ; retract 12mm 
+{template_custom_gcode}
+
+;____________ Rapid travel to cut area ______________
+G0 X20 Y5
+G0 Y-3
+M400
+
+{else}
+;____________ Rapid travel to cut area ______________
+G0 X20 Y5
+G0 Y-3
+M400
+G0 E-12 F{retraction_speed[previous_extruder] * 60} ; retract 12mm
+G0 Z{max_layer_z + 5} ; drop bed a bit incase string
+M400 P100 ; finish move before tool change
+
+{endif}
+
+;____________________ Tool Change ____________________
+; determin speed up temp change
+M620.11 S0 ; cancel FW retractions
+
+M620.1 E F[old_filament_e_feedrate] T200 ; {nozzle_temperature_range_high[next_extruder]}
+
+T[next_extruder]
+
+M620.1 E F[new_filament_e_feedrate] T{nozzle_temperature_range_high[next_extruder]} ; set end tool change parameters
+M104 S{nozzle_temperature_range_high[next_extruder] + 10}
+M400
+M960 S4 P1 ; set tool light on so webcam can see better - X1 only
+
+G0 X60 Y264.5 ; needed only for slicer to not error but the tool is already in the chute
+;_________________ determin cooling assistance _________________
+
+M400
+M106 S0 ; filament change might trigger fan - we want to control it ourselves
+
+;__________________ Put Filament Back __________________
+;putting back long retraction
+G0 E{12 * 0.90} F{(filament_max_volumetric_speed[previous_extruder]/2.4053*60)*0.75}
+
+G92 E0
+M83
+; FLUSH_START
+M400 P250
+M204 S800
+;_____________ push new material to nozzle and old material out _________________
+G0 E0.75 F50
+G0 E5.78 F{(filament_max_volumetric_speed[previous_extruder]/2.4053*60)*0.75}
+G0 X61 F{120 * 60}
+G0 E0.75 F50
+G0 E5.78 F{filament_max_volumetric_speed[previous_extruder]/2.4053*60}
+G0 X62 F{120 * 60}
+G0 E0.75 F50
+G0 E5.78 F{filament_max_volumetric_speed[previous_extruder]/2.4053*60}
+G0 X63 F{120 * 60}
+G0 E0.75 F50
+G0 E5.78 F{filament_max_volumetric_speed[previous_extruder]/2.4053*60}
+G0 X64 F{120 * 60}
+G0 E0.75 F50
+G0 E5.78 F{filament_max_volumetric_speed[previous_extruder]/2.4053*60}
+; FLUSH_END
+
+M104 S[new_filament_temp]
+M106 S0
+M400
+
+{if next_extruder < 255} ; if next extruder is not pullback to AMS
+
+
+{if flush_length_1 > 1}
+M400
+
+{if flush_length_1 > 23.7}
+G0 X65 F{120 * 60}
+; FLUSH_START
+G0 E{(flush_length_1 - 23.7) * 0.02} F50
+G0 E{(flush_length_1 - 23.7) * 0.23} F{new_filament_e_feedrate}
+G0 X66 F{120 * 60}
+G0 E{(flush_length_1 - 23.7) * 0.02} F50
+G0 E{(flush_length_1 - 23.7) * 0.23} F{new_filament_e_feedrate}
+G0 X67 F{120 * 60}
+G0 E{(flush_length_1 - 23.7) * 0.02} F50
+G0 E{(flush_length_1 - 23.7) * 0.23} F{new_filament_e_feedrate}
+G0 X68 F{120 * 60}
+G0 E{(flush_length_1 - 23.7) * 0.02} F50
+G0 E{(flush_length_1 - 23.7) * 0.23} F{new_filament_e_feedrate}
+G0 X70 F{120 * 60}
+
+{else}
+
+G0 X70 E{flush_length_1} F{old_filament_e_feedrate}
+
+{endif}
+
+; FLUSH_END
+
+{endif}
+
+{if flush_length_2 > 1}
+
+;_______________________ empty chute _______________________
+M204 S20000 
+G0 E-{retract_length_toolchange[0]} F{retraction_speed[next_extruder] * 60} ; retract using slicer pre-determined amount
+M400
+M106 P1 S255 ; cool string with part fan
+G0 F{500 * 60} ; set speed for move
+M400 P1700
+M106 P1 S0 ; turn off fan
+G0 X130 ; break string
+G0 X100 Y245 ; pull out to avoid chute stick
+G0 X60 ; chute entry position
+G0 Y264.5 F{60 * 60} ; enter chute 
+
+; FLUSH_START
+G0 E{flush_length_2 * 0.18} F{new_filament_e_feedrate}
+G0 X61 F{120 * 60}
+G0 E{flush_length_2 * 0.02} F50
+G0 X62 F{120 * 60}
+G0 E{flush_length_2 * 0.18} F{new_filament_e_feedrate}
+G0 X63 F{120 * 60}
+G0 E{flush_length_2 * 0.02} F50
+G0 X64 F{120 * 60}
+G0 E{flush_length_2 * 0.18} F{new_filament_e_feedrate}
+G0 X65 F{120 * 60}
+G0 E{flush_length_2 * 0.02} F50
+G0 X66 F{120 * 60}
+G0 E{flush_length_2 * 0.18} F{new_filament_e_feedrate}
+G0 X67 F{120 * 60}
+G0 E{flush_length_2 * 0.02} F50
+G0 X68 F{120 * 60}
+G0 E{flush_length_2 * 0.18} F{new_filament_e_feedrate}
+G0 X69 F{120 * 60}
+G0 E{flush_length_2 * 0.02} F50
+G0 X70 F{120 * 60}
+; FLUSH_END
+
+{endif}
+
+{if flush_length_3 > 1}
+
+;_______________________ empty chute _______________________
+M204 S20000 
+G0 E-{retract_length_toolchange[0]} F{retraction_speed[next_extruder] * 60} ; retract using slicer pre-determined amount
+M400
+M106 P1 S255 ; cool string with part fan
+G0 F{500 * 60} ; set speed for move
+M400 P1700
+M106 P1 S0 ; turn off fan
+G0 X130 ; break string
+G0 X100 Y245 ; pull out to avoid chute stick
+G0 X60 ; chute entry position
+G0 Y264.5 F{60 * 60} ; enter chute 
+
+; FLUSH_START
+G0 E{flush_length_3 * 0.18} F{new_filament_e_feedrate}
+G0 X61 F{120 * 60}
+G0 E{flush_length_3 * 0.02} F50
+G0 X62 F{120 * 60}
+G0 E{flush_length_3 * 0.18} F{new_filament_e_feedrate}
+G0 X63 F{120 * 60}
+G0 E{flush_length_3 * 0.02} F50
+G0 X64 F{120 * 60}
+G0 E{flush_length_3 * 0.18} F{new_filament_e_feedrate}
+G0 X65 F{120 * 60}
+G0 E{flush_length_3 * 0.02} F50
+G0 X66 F{120 * 60}
+G0 E{flush_length_3 * 0.18} F{new_filament_e_feedrate}
+G0 X67 F{120 * 60}
+G0 E{flush_length_3 * 0.02} F50
+G0 X68 F{120 * 60}
+G0 E{flush_length_3 * 0.18} F{new_filament_e_feedrate}
+G0 X69 F{120 * 60}
+G0 E{flush_length_3 * 0.02} F50
+G0 X70 F{120 * 60}
+; FLUSH_END
+
+{endif}
+
+M104 S[new_filament_temp] ; wait for new temp 
+
+{if flush_length_4 > 1}
+
+;_______________________ empty chute _______________________
+M204 S20000 
+G0 E-{retract_length_toolchange[0]} F{retraction_speed[next_extruder] * 60} ; retract using slicer pre-determined amount
+M400
+M106 P1 S255 ; cool string with part fan
+G0 F{500 * 60} ; set speed for move
+M400 P1700
+M106 P1 S0 ; turn off fan
+G0 X130 ; break string
+G0 X100 Y245 ; pull out to avoid chute stick
+G0 X60 ; chute entry position
+G0 Y264.5 F{60 * 60} ; enter chute 
+
+; FLUSH_START
+G0 E{flush_length_4 * 0.18} F{new_filament_e_feedrate}
+G0 X61 F{120 * 60}
+G0 E{flush_length_4 * 0.02} F50
+G0 X62 F{120 * 60}
+G0 E{flush_length_4 * 0.18} F{new_filament_e_feedrate}
+G0 X63 F{120 * 60}
+G0 E{flush_length_4 * 0.02} F50
+G0 X64 F{120 * 60}
+G0 E{flush_length_4 * 0.18} F{new_filament_e_feedrate}
+G0 X65 F{120 * 60}
+G0 E{flush_length_4 * 0.02} F50
+G0 X66 F{120 * 60}
+G0 E{flush_length_4 * 0.18} F{new_filament_e_feedrate}
+G0 X67 F{120 * 60}
+G0 E{flush_length_4 * 0.02} F50
+G0 X68 F{120 * 60}
+G0 E{flush_length_4 * 0.18} F{new_filament_e_feedrate}
+G0 X69 F{120 * 60}
+G0 E{flush_length_4 * 0.02} F50
+G0 X70 F{120 * 60}
+; FLUSH_END
+
+{endif}
+
+M106 P1 S0
+M400
+
+;_______________________ empty chute _______________________
+M204 S20000 
+G0 E-{retract_length_toolchange[0]} F{retraction_speed[next_extruder] * 60} ; retract using slicer pre-determined amount
+M400
+M106 P1 S255 ; cool string with part fan
+G0 F{500 * 60} ; set speed for move
+M400 P1700
+M106 P1 S0 ; turn off fan
+
+;+++++++++++++++++++++++++++++
+;1 SteinSwitch chute_tapping
+
+;Set to "true" to use chute tapping knock down motion to knock any stuck purge down
+;Set to "false" to skip
+
+{if true}
+;+++++++++++++++++++++++++++++
+G0 X130 ; break string
+G0 X100 Y245 ; pull out to safe area 
+G0 X60
+;______________ chute tapping _________________
+M204 S{20000 * 0.20} ; tap aggressiveness 20%
+G0 F{240 * 60} ; tap speed
+G0 Y264.5 
+G0 Y258
+G0 Y264.5
+G0 Y258
+G0 Y264.5
+M400 P300 ; short pause 
+G0 Y250
+M400
+{else}
+G0 X130 ; break string
+{endif}
+
+
+M960 S4 P0 ; set tool light off
+
+;+++++++++++++++++++++++++++++
+;1 SteinSwitch return_to_print_wipe_cycle
+
+;Set to "true" to use option
+;Set to "false" to skip
+
+{if true}
+;+++++++++++++++++++++++++++++
+
+;____________Move to wiper pad entry position__________
+G0 F{500 * 60} 
+M204 S20000  
+G0 X161.3 Y261.3 Z{max_layer_z + z_hop[0]}; go to wiper entry position and get bed ready for re-entry
+
+{template_custom_gcode}
+{endif}
+
+G0 Y250 ; move Y to aside, prevent collision
+M400
+
+{else}
+
+M204 S20000
+G0 F{500 * 60} 
+;***************************************
+; WARNING this variable is broken dont use. Causes travel outside of plate
+;G0 X[x_after_toolchange] Y[y_after_toolchange] Z[z_after_toolchange] F30000 
+;***************************************
+
+{endif}
+
+;last position before AMS resume
+;***************************************
+; WARNING this variable is broken dont use. Causes travel outside of plate
+;G0 X[x_after_toolchange] Y[y_after_toolchange] Z[z_after_toolchange] F30000 
+;***************************************
+
+M621 S[next_extruder]A ; close tool change
+
+M960 S5 P1 ; end material change
+

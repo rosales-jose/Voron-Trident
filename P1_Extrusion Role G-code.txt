@@ -1,0 +1,34 @@
+;Orca_P1_Extrusion Role G-code
+;==========================================================
+;----------------------LECKIESTEIN-------------------------
+;==========================================================
+
+;_Release_Jan.25.1.2025
+; Initial Beta Release
+
+; set correct acceleration after material change
+{if extrusion_role == "Perimeter"}
+
+{if layer_z <= (initial_layer_print_height + 0.001)}
+
+M204 S[initial_layer_acceleration]
+
+{else}
+
+M204 S[outer_wall_acceleration] ; Set acceleration for Perimeter
+
+{endif}
+
+{else}
+
+{if layer_z <= (initial_layer_print_height + 0.001)}
+
+M204 S[initial_layer_acceleration]
+
+{else}
+
+M204 S[default_acceleration]
+
+{endif}
+
+{endif}

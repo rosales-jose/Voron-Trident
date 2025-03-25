@@ -1,0 +1,53 @@
+;Orca_P1_Before Layer Change G-code
+;==========================================================
+;----------------------LECKIESTEIN-------------------------
+;==========================================================
+
+;_SWMC Core_Feb.15.2025
+;_Core Version_1
+;_Released_Feb.23.2025
+
+;+++++++++++++++++++++++++++++
+;SteinSwitch add_wipe_cycle_for_specific_layer
+
+;Set to "true" to enable
+;Set to "false" to disable
+
+{if false} ; toggle feature on or off
+;+++++++++++++++++++++++++++++
+; Set special layers here, additional conditions can be added (replace “1000” with your layer number): 
+
+{if layer_num==10000 || layer_num==10000 || layer_num==10000 || layer_num==10000 || layer_num==10000} 
+;+++++++++++++++++++++++++++++
+M83
+G0 E-[retraction_length[initial_extruder]] F{retraction_speed[initial_extruder] * 60} ; retract
+G91
+{if z_hop[current_extruder] <= 0.2}
+
+G0 Z0.5
+
+{else}
+
+G0 Z{z_hop[current_extruder]}
+
+{endif}
+G90
+M83
+
+;_______________Leave print and move to wiper_______________
+G0 F{500 * 60} ; set speed to machine max 500mm/s
+M204 S20000 ; set acc to max
+
+;_______________Get ready to wipe_______________
+G0 X161.3 Y261.3 F{500 * 60} ; go to wiper entry position
+;_______ wipe cycle __________
+{template_custom_gcode}
+
+;go to the center of the print to avoid travel bug
+G0 X{first_layer_center_no_wipe_tower[0]} Y{first_layer_center_no_wipe_tower[1]} F{500 * 60}
+M204 S[default_acceleration]
+G0 E[retraction_length[initial_extruder]] F{retraction_speed[initial_extruder] * 60} ; unretract
+
+{endif}
+
+{endif}

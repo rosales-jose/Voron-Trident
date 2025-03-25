@@ -1,0 +1,58 @@
+;Orca_P1_Layer Change G-code
+;==========================================================
+;----------------------LECKIESTEIN-------------------------
+;==========================================================
+
+;_SWMC Core_Feb.15.2025
+;_Core Version_1
+;_Released_Feb.23.2025
+
+; layer num/total_layer_count: {layer_num+1}/[total_layer_count]
+M622.1 S1 ; for prev firmware, default turned on
+M1002 judge_flag timelapse_record_flag
+M622 J1
+
+{if timelapse_type == 0} ; timelapse without wipe tower
+
+M971 S11 C10 O0
+
+{elsif timelapse_type == 1} ; timelapse with wipe tower
+G0 F{500 * 60}
+G92 E0
+G0 E-[retraction_length[current_extruder]] F{retraction_speed[current_extruder] * 60} ; retract
+G07
+G2 Z{layer_z + 0.4} I0.86 J0.86 P1 F30000 ; spiral lift a little
+G0 X65 Y245 ; move to safe pos
+G07
+G2 Z{layer_z} I0.86 J0.86 P1 F30000
+G0 Y264.5 F3000
+M400 P300
+M971 S11 C10 O0
+G92 E0
+G0 E-[retraction_length[initial_extruder]] F{retraction_speed[initial_extruder] * 60} ; retract
+G0 F{500 * 60}
+M204 S20000
+G0 X140 
+;+++++++++++++++++++++++++++++
+;1 SteinSwitch return_to_print_wipe_cycle
+
+;Set to "true" to use option
+;Set to "false" to skip
+
+{if true}
+;+++++++++++++++++++++++++++++
+
+;____________Move to wiper pad entry position__________
+G0 F{500 * 60} 
+M204 S20000  
+G0 X161.3 Y261.3 Z{max_layer_z + z_hop[0]}; go to wiper entry position and get bed ready for re-entry
+
+{template_custom_gcode}
+{endif}
+
+G0 Y255
+M204 S[default_acceleration]
+
+{endif}
+
+M623
