@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BBEditDocumentType</key>
+	<string>CodelessLanguageModule</string>
+	<key>BBLMLanguageDisplayName</key>
+	<string>Klipper</string>
+	<key>BBLMLanguageCode</key>
+	<string>Klip</string>
+	<key>BBLMSuffixMap</key>
+	<array>
+		<dict>
+			<key>BBLMLanguageSuffix</key>
+			<string>.cfg</string>
+		</dict>
+	</array>
+	<key>BBLMCanSpellCheckCodeRuns</key>
+	<false/>
+	<key>BBLMColorsSyntax</key>
+	<true/>
+	<key>BBLMIsCaseSensitive</key>
+	<false/>
+	<key>BBLMScansFunctions</key>
+	<true/>
+	<key>Language Features</key>
+	<dict>
+		<key>Identifier and Keyword Character Class</key>
+		<string>A-Za-z0-9_\-!^:</string>
+		<key>Comment Pattern</key>
+		<string>#.*$</string>
+		<key>String Pattern</key>
+		<string>"[^"]*"|'[^']*'</string>
+		<key>Function Pattern</key>
+		<string>^\[(?P&lt;function_name&gt;.*)\]</string>
+		<key>Keyword List</key>
+		<array>
+			<string>true</string>
+			<string>false</string>
+			<string>pid</string>
+			<string>watermark</string>
+			<string>min_temp</string>
+			<string>max_temp</string>
+			<string>heater_temp</string>
+			<string>corexy</string>
+			<string>cartesian</string>
+			<string>gcode:</string>
+		</array>
+		<key>Predefined Symbol List</key>
+		<array>
+			<string>G0</string><string>G1</string><string>G2</string><string>G3</string><string>G4</string>
+			<string>G5</string><string>G6</string><string>G7</string><string>G8</string><string>G9</string>
+			<string>M0</string><string>M1</string><string>M2</string><string>M3</string><string>M4</string>
+			<string>M5</string><string>M6</string><string>M7</string><string>M8</string><string>M9</string>
+		</array>
+	</dict>
+</dict>
+</plist>
