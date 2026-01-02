@@ -27,40 +27,54 @@
 	<dict>
 		<key>Identifier and Keyword Character Class</key>
 		<string>A-Za-z0-9_\-!^:</string>
+		
 		<key>Comment Pattern</key>
 		<string>#.*$</string>
+		
 		<key>String Pattern</key>
-		<string>"[^"]*"|'[^']*'</string>
+		<string>"[^"]*"|'[^']*'|\[[^\]]+\]</string>
+		
 		<key>Function Pattern</key>
 		<string>^\[(?P&lt;function_name&gt;.*)\]</string>
+		
 		<key>Keyword List</key>
 		<array>
-			<string>true</string><string>false</string><string>params</string><string>printer</string>
-			<string>step_pin</string><string>dir_pin</string><string>enable_pin</string><string>microsteps</string>
-			<string>rotation_distance</string><string>endstop_pin</string><string>position_endstop</string>
+			<string>true</string><string>false</string>
+			<string>step_pin</string><string>dir_pin</string><string>enable_pin</string>
+			<string>microsteps</string><string>rotation_distance</string><string>full_steps_per_rotation</string>
+			<string>gear_ratio</string><string>endstop_pin</string><string>position_endstop</string>
 			<string>position_max</string><string>position_min</string><string>homing_speed</string>
+			<string>homing_retract_dist</string><string>second_homing_speed</string>
 			<string>nozzle_diameter</string><string>filament_diameter</string><string>sensor_type</string>
-			<string>sensor_pin</string><string>control</string><string>pid_Kp</string><string>pid_Ki</string>
-			<string>pid_Kd</string><string>min_temp</string><string>max_temp</string><string>min_extrude_temp</string>
+			<string>sensor_pin</string><string>control</string><string>pid_Kp</string>
+			<string>pid_Ki</string><string>pid_Kd</string><string>min_temp</string>
+			<string>max_temp</string><string>min_extrude_temp</string><string>pressure_advance</string>
+			<string>pressure_advance_smooth_time</string><string>max_extrude_only_distance</string>
 			<string>run_current</string><string>hold_current</string><string>stealthchop_threshold</string>
-			<string>uart_pin</string><string>tx_pin</string><string>select_setting</string><string>rename_existing</string>
-			<string>gcode:</string><string>variable_</string><string>description:</string>
-			<string>SET_GCODE_VARIABLE</string><string>SAVE_GCODE_STATE</string><string>RESTORE_GCODE_STATE</string>
-			<string>GET_POSITION</string><string>SET_GCODE_OFFSET</string><string>SET_VELOCITY_LIMIT</string>
-			<string>TEMPERATURE_WAIT</string><string>SET_HEATER_TEMPERATURE</string><string>SET_FAN_SPEED</string>
-			<string>QUERY_ENDSTOPS</string><string>QUERY_PROBE</string><string>PROBE_ACCURACY</string>
-			<string>BED_MESH_CALIBRATE</string><string>BED_MESH_PROFILE</string><string>G32</string>
+			<string>interpolate</string><string>sense_resistor</string><string>uart_pin</string>
+			<string>tx_pin</string><string>select_setting</string><string>driver_SGT</string>
+			<string>shaper_freq_x</string><string>shaper_freq_y</string><string>shaper_type</string>
+			<string>gcode:</string><string>variable_</string><string>rename_existing</string>
+			<string>default_parameter</string>
 		</array>
+		
 		<key>Predefined Symbol List</key>
 		<array>
-			<string>stepper_x</string><string>stepper_y</string><string>stepper_z</string>
-			<string>extruder</string><string>heater_bed</string><string>mcu</string><string>fan</string>
-			<string>heater_fan</string><string>tmc2209</string><string>tmc2130</string><string>probe</string>
-			<string>bltouch</string><string>display</string><string>gcode_macro</string><string>include</string>
+			<string>G0</string><string>G1</string><string>G2</string><string>G3</string>
+			<string>G4</string><string>G10</string><string>G11</string><string>G28</string>
+			<string>G29</string><string>G90</string><string>G91</string><string>G92</string>
+			<string>M82</string><string>M83</string><string>M104</string><string>M106</string>
+			<string>M107</string><string>M109</string><string>M117</string><string>M140</string>
+			<string>M190</string><string>M600</string><string>M84</string>
+			<string>printer</string><string>stepper</string><string>extruder</string>
+			<string>toolhead</string><string>heater_bed</string>
 			<string>PAUSE</string><string>RESUME</string><string>CANCEL_PRINT</string>
 			<string>START_PRINT</string><string>END_PRINT</string><string>LOAD_FILAMENT</string>
-			<string>UNLOAD_FILAMENT</string><string>_CLIENT_VARIABLE</string><string>_TOOLHEAD_PARK_PAUSE_CANCEL</string>
-			<string>MAINS_PARAMS</string><string>PARK_MACRO</string>
+			<string>UNLOAD_FILAMENT</string><string>TEST_SPEED</string><string>GET_POSITION</string>
+			<string>QUERY_ENDSTOPS</string><string>BED_MESH_CALIBRATE</string><string>SCREWS_TILT_CALCULATE</string>
+			<string>Z_TILT_ADJUST</string><string>QUAD_GANTRY_LEVEL</string><string>PROBE_CALIBRATE</string>
+			<string>PID_CALIBRATE</string><string>FIRMWARE_RESTART</string><string>RESTART</string>
+			<string>SAVE_CONFIG</string><string>DUMP_TMC</string>
 		</array>
 	</dict>
 </dict>
